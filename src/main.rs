@@ -157,8 +157,9 @@ fn main() {
         let score_texture = texture_creator.create_texture_from_surface(&score_surface).unwrap();
         let TextureQuery { width: score_width, height: score_height, .. } = score_texture.query();
     
-        score_rect.set_width(score_width);
-        score_rect.set_height(score_height);
+        let score_aspect_ratio = score_width / score_height;
+        score_rect.set_width(210);
+        score_rect.set_height(210 / score_aspect_ratio);
 
         canvas.copy(&score_texture, None, score_rect).unwrap();
 
