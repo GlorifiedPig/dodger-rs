@@ -21,15 +21,17 @@ struct Size {
 struct Entity {
     position: Position,
     size: Size,
+    speed: f32,
     rect: Rect
 }
 
 impl Entity {
-    fn new(position: Position, size: Size) -> Entity {
+    fn new(position: Position, size: Size, speed: f32) -> Entity {
         Entity {
             rect: Rect::new(position.x.round() as i32, position.y.round() as i32, size.width, size.height),
             position: position,
             size: size,
+            speed: speed
         }
     }
 
@@ -45,13 +47,15 @@ impl Entity {
 fn main() {
     let mut player: Entity = Entity::new(
         Position { x: 364.0, y: 500.0 },
-        Size { width: 64, height: 64 }
+        Size { width: 64, height: 64 },
+        3.0
     );
 
     let mut enemies: Vec<Entity> = vec![
         Entity::new(
             Position { x: 0.0, y: 0.0 },
-            Size { width: 64, height: 64 }
+            Size { width: 64, height: 64 },
+            1.0
         )
     ];
 
@@ -96,8 +100,8 @@ fn main() {
 
         for scancode in event_pump.keyboard_state().pressed_scancodes().into_iter() {
             match scancode {
-                Scancode::A | Scancode::Left => move_dir = -3.0,
-                Scancode::D | Scancode::Right => move_dir = 3.0,
+                Scancode::A | Scancode::Left => move_dir = -player.speed,
+                Scancode::D | Scancode::Right => move_dir = player.speed,
                 _ => {}
             }
         }
@@ -108,7 +112,7 @@ fn main() {
 
         // Enemies
         for enemy in &mut enemies {
-            enemy.position.y = enemy.position.y + 1.0;
+            enemy.position.y = enemy.position.y + enemy.speed;
             canvas.copy(&enemy_texture, None, Some(enemy.get_rect())).unwrap();
         }
 
