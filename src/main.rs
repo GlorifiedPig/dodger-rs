@@ -71,6 +71,7 @@ fn main() {
         )
     ];
 
+    let mut score: u32 = 0;
     let mut score_rect = Rect::new(15, 15, 0, 0);
 
     // SDL2
@@ -145,13 +146,14 @@ fn main() {
             if enemy.position.y > window_height as f32 {
                 enemy.position.x = rand::random::<f32>() * ((window_width - enemy.size.width) as f32);
                 enemy.position.y = -(enemy.size.width as f32);
+                score = score + 1;
             }
 
             canvas.copy(&enemy_texture, None, Some(enemy.rect)).unwrap();
         }
 
         // Draw Score
-        let score_surface = font.render("Score: 0").blended(Color::WHITE).unwrap();
+        let score_surface = font.render(format!("Score: {}", score).as_str()).blended(Color::WHITE).unwrap();
         let score_texture = texture_creator.create_texture_from_surface(&score_surface).unwrap();
         let TextureQuery { width: score_width, height: score_height, .. } = score_texture.query();
     
