@@ -67,8 +67,8 @@ fn main() {
 
     let mut enemies: Vec<Entity> = vec![
         Entity::new(
-            Position { x: 0.0, y: 0.0 },
-            Size { width: 72, height: 72 },
+            Position { x: 364.0, y: 0.0 },
+            Size { width: 64, height: 64 },
             2.3
         )
     ];
