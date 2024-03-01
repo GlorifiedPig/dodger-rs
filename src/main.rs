@@ -97,14 +97,6 @@ fn main() {
         // Event Loop
         for event in event_pump.poll_iter() {
             match event {
-                Event::KeyDown { keycode, .. } => {
-                    if let Some(pressed_key) = keycode {
-                        match pressed_key {
-                            Keycode::Escape | Keycode::Q => break 'running,
-                            _ => {}
-                        }
-                    }
-                },
                 Event::Quit {..} => break 'running,
                 _ => {}
             }
@@ -115,6 +107,7 @@ fn main() {
 
         for scancode in event_pump.keyboard_state().pressed_scancodes().into_iter() {
             match scancode {
+                Scancode::Escape | Scancode::Q => break 'running,
                 Scancode::A | Scancode::Left => move_dir = -player.speed,
                 Scancode::D | Scancode::Right => move_dir = player.speed,
                 _ => {}
