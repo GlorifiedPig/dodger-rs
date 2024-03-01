@@ -1,6 +1,4 @@
 
-extern crate sdl2;
-
 use sdl2::image::LoadTexture;
 use sdl2::pixels::Color;
 use sdl2::event::Event;
@@ -59,6 +57,9 @@ fn rects_collide(a: &Rect, b: &Rect) -> bool {
 }
 
 fn main() {
+    let window_width = 800;
+    let window_height = 600;
+
     let mut player: Entity = Entity::new(
         Position { x: 364.0, y: 500.0 },
         Size { width: 64, height: 64 },
@@ -76,7 +77,7 @@ fn main() {
     let sdl_context = sdl2::init().unwrap();
     let video_subsystem = sdl_context.video().unwrap();
 
-    let window = video_subsystem.window("Dodger", 800, 600)
+    let window = video_subsystem.window("Dodger", window_width, window_height)
         .position_centered()
         .build()
         .unwrap();
@@ -122,6 +123,12 @@ fn main() {
 
         player.position.x = player.position.x + move_dir;
 
+        if player.position.x < -(player.size.width as f32) {
+            player.position.x = window_width as f32;
+        } else if player.position.x > window_width as f32 {
+            player.position.x = -(player.size.width as f32);
+        }
+
         canvas.copy(&player_texture, None, Some(player.get_rect())).unwrap();
 
         // Enemies
@@ -131,6 +138,11 @@ fn main() {
             if rects_collide(&enemy.get_rect(), &player.get_rect()) {
                 println!("Game over.");
                 break 'running;
+            }
+
+            if enemy.position.y > window_height as f32 {
+                enemy.position.x = rand::random::<f32>() * ((window_width - enemy.size.width) as f32);
+                enemy.position.y = -(enemy.size.width as f32);
             }
 
             canvas.copy(&enemy_texture, None, Some(enemy.get_rect())).unwrap();
