@@ -62,14 +62,14 @@ fn main() {
     let mut player: Entity = Entity::new(
         Position { x: 364.0, y: 500.0 },
         Size { width: 64, height: 64 },
-        3.0
+        3.5
     );
 
     let mut enemies: Vec<Entity> = vec![
         Entity::new(
             Position { x: 0.0, y: 0.0 },
-            Size { width: 64, height: 64 },
-            1.0
+            Size { width: 72, height: 72 },
+            2.3
         )
     ];
 
