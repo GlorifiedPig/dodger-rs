@@ -136,7 +136,7 @@ fn main() {
         canvas.copy(&player_texture, None, Some(player.rect)).unwrap();
 
         // Enemies
-        let difficulty = (runtime / 5.0).floor().max(20.0) as u32; // difficulty increases every 5 seconds with a maximum of 20.
+        let difficulty = (runtime / 5.0).floor().min(20.0) as u32; // difficulty increases every 5 seconds with a maximum of 20.
 
         if enemies.len() < (starting_enemies + difficulty) as usize && runtime > last_enemy_spawn + 0.65 {
             let random_enemy_size: u32 = rand::thread_rng().gen_range(64 + difficulty..=96 + difficulty * 2);
