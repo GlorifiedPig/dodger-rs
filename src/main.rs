@@ -4,6 +4,7 @@ use sdl2::pixels::Color;
 use sdl2::event::Event;
 use sdl2::keyboard::Scancode;
 use sdl2::rect::Rect;
+use sdl2::render::TextureQuery;
 use std::time::Duration;
 
 struct Position {
@@ -52,6 +53,7 @@ fn rects_collide(a: &Rect, b: &Rect) -> bool {
 }
 
 fn main() {
+    // Game Config
     let window_width = 800;
     let window_height = 600;
 
@@ -69,8 +71,12 @@ fn main() {
         )
     ];
 
+    let mut score_rect = Rect::new(15, 15, 0, 0);
+
+    // SDL2
     let sdl_context = sdl2::init().unwrap();
     let video_subsystem = sdl_context.video().unwrap();
+    let ttf_context = sdl2::ttf::init().unwrap();
 
     let window = video_subsystem.window("Dodger", window_width, window_height)
         .position_centered()
@@ -79,17 +85,22 @@ fn main() {
 
     let mut canvas = window.into_canvas().build().unwrap();
     
+    // Font
+    let font = ttf_context.load_font("assets/Invasion2000.ttf", 128).unwrap();
+
+    // Textures
     let texture_creator = canvas.texture_creator();
     let player_texture = texture_creator.load_texture("assets/player.png").unwrap();
     let enemy_texture = texture_creator.load_texture("assets/baddie.png").unwrap();
 
+    // Game Loop
     let mut event_pump = sdl_context.event_pump().unwrap();
     'running: loop {
         // Clear Canvas
         canvas.set_draw_color(Color::RGB(0, 0, 0));
         canvas.clear();
 
-        // Event Loop
+        // Event Handler
         for event in event_pump.poll_iter() {
             match event {
                 Event::Quit {..} => break 'running,
@@ -138,6 +149,16 @@ fn main() {
 
             canvas.copy(&enemy_texture, None, Some(enemy.rect)).unwrap();
         }
+
+        // Draw Score
+        let score_surface = font.render("Score: 0").blended(Color::WHITE).unwrap();
+        let score_texture = texture_creator.create_texture_from_surface(&score_surface).unwrap();
+        let TextureQuery { width: score_width, height: score_height, .. } = score_texture.query();
+    
+        score_rect.set_width(score_width);
+        score_rect.set_height(score_height);
+
+        canvas.copy(&score_texture, None, score_rect).unwrap();
 
         // Present the canvas & sleep
         canvas.present();
