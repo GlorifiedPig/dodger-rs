@@ -8,21 +8,51 @@ use sdl2::keyboard::{Keycode, Scancode};
 use sdl2::rect::Rect;
 use std::time::Duration;
 
-struct Player {
-    position: Rect
+struct Position {
+    x: f32,
+    y: f32
 }
 
-struct Enemy {
-    position: Rect
+struct Size {
+    width: u32,
+    height: u32
+}
+
+struct Entity {
+    position: Position,
+    size: Size,
+    rect: Rect
+}
+
+impl Entity {
+    fn new(position: Position, size: Size) -> Entity {
+        Entity {
+            rect: Rect::new(position.x.round() as i32, position.y.round() as i32, size.width, size.height),
+            position: position,
+            size: size,
+        }
+    }
+
+    fn get_rect(&mut self) -> Rect {
+        self.rect.x = self.position.x.round() as i32;
+        self.rect.y = self.position.y.round() as i32;
+        self.rect.w = self.size.width as i32;
+        self.rect.h = self.size.height as i32;
+        self.rect
+    }
 }
 
 fn main() {
-    let mut player: Player = Player {
-        position: Rect::new(400, 500, 64, 64)
-    };
+    let mut player: Entity = Entity::new(
+        Position { x: 300.0, y: 500.0 },
+        Size { width: 64, height: 64 }
+    );
 
-    let enemies: Vec<Enemy> = vec![
-        Enemy{ position: Rect::new(0, 0, 64, 64) }
+    let mut enemies: Vec<Entity> = vec![
+        Entity::new(
+            Position { x: 0.0, y: 0.0 },
+            Size { width: 64, height: 64 }
+        )
     ];
 
     let sdl_context = sdl2::init().unwrap();
@@ -60,17 +90,18 @@ fn main() {
 
         for scancode in event_pump.keyboard_state().pressed_scancodes().into_iter() {
             match scancode {
-                Scancode::A => player.position.x = player.position.x - 3,
-                Scancode::D => player.position.x = player.position.x + 3,
+                Scancode::A => player.position.x = player.position.x - 3.0,
+                Scancode::D => player.position.x = player.position.x + 3.0,
                 _ => {}
             }
         }
 
-        for enemy in &enemies {
-            canvas.copy(&enemy_texture, None, Some(enemy.position)).unwrap();
+        for enemy in &mut enemies {
+            enemy.position.y = enemy.position.y + 1.0;
+            canvas.copy(&enemy_texture, None, Some(enemy.get_rect())).unwrap();
         }
 
-        canvas.copy(&player_texture, None, Some(player.position)).unwrap();
+        canvas.copy(&player_texture, None, Some(player.get_rect())).unwrap();
 
         // The rest of the game loop goes here...
 
