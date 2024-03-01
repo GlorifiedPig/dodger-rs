@@ -44,6 +44,20 @@ impl Entity {
     }
 }
 
+fn rects_collide(a: &Rect, b: &Rect) -> bool {
+    let a_left = a.x;
+    let a_right = a.x + a.w as i32;
+    let a_top = a.y;
+    let a_bottom = a.y + a.h as i32;
+
+    let b_left = b.x;
+    let b_right = b.x + b.w as i32;
+    let b_top = b.y;
+    let b_bottom = b.y + b.h as i32;
+
+    a_left < b_right && a_right > b_left && a_top < b_bottom && a_bottom > b_top
+}
+
 fn main() {
     let mut player: Entity = Entity::new(
         Position { x: 364.0, y: 500.0 },
@@ -113,6 +127,12 @@ fn main() {
         // Enemies
         for enemy in &mut enemies {
             enemy.position.y = enemy.position.y + enemy.speed;
+
+            if rects_collide(&enemy.get_rect(), &player.get_rect()) {
+                println!("Game Over!");
+                break 'running;
+            }
+
             canvas.copy(&enemy_texture, None, Some(enemy.get_rect())).unwrap();
         }
 
