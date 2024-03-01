@@ -123,10 +123,10 @@ fn main() {
 
         player.position.x = player.position.x + move_dir;
 
-        if player.position.x < -(player.size.width as f32) {
-            player.position.x = window_width as f32;
-        } else if player.position.x > window_width as f32 {
-            player.position.x = -(player.size.width as f32);
+        if player.position.x <= 0.0 {
+            player.position.x = 0.0;
+        } else if player.position.x >= (window_width - player.size.width) as f32 {
+            player.position.x = (window_width - player.size.width) as f32;
         }
 
         canvas.copy(&player_texture, None, Some(player.get_rect())).unwrap();
