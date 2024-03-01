@@ -44,7 +44,7 @@ impl Entity {
 
 fn main() {
     let mut player: Entity = Entity::new(
-        Position { x: 300.0, y: 500.0 },
+        Position { x: 364.0, y: 500.0 },
         Size { width: 64, height: 64 }
     );
 
@@ -88,13 +88,21 @@ fn main() {
             }
         }
 
+        let mut moving_left = false;
+        let mut moving_right = false;
+
         for scancode in event_pump.keyboard_state().pressed_scancodes().into_iter() {
             match scancode {
-                Scancode::A => player.position.x = player.position.x - 3.0,
-                Scancode::D => player.position.x = player.position.x + 3.0,
+                Scancode::A => moving_left = true,
+                Scancode::Left => moving_left = true,
+                Scancode::D => moving_right = true,
+                Scancode::Right => moving_right = true,
                 _ => {}
             }
         }
+
+        if moving_left { player.position.x = player.position.x - 3.0 }
+        if moving_right { player.position.x = player.position.x + 3.0 }
 
         for enemy in &mut enemies {
             enemy.position.y = enemy.position.y + 1.0;
@@ -102,8 +110,6 @@ fn main() {
         }
 
         canvas.copy(&player_texture, None, Some(player.get_rect())).unwrap();
-
-        // The rest of the game loop goes here...
 
         canvas.present();
         ::std::thread::sleep(Duration::new(0, 1_000_000_000u32 / 60));
