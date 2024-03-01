@@ -1,11 +1,12 @@
 
+use rand::prelude::*;
 use sdl2::image::LoadTexture;
 use sdl2::pixels::Color;
 use sdl2::event::Event;
 use sdl2::keyboard::Scancode;
 use sdl2::rect::Rect;
 use sdl2::render::TextureQuery;
-use std::time::Duration;
+use std::time::{Duration, Instant};
 
 struct Position {
     x: f32,
@@ -54,6 +55,8 @@ fn rects_collide(a: &Rect, b: &Rect) -> bool {
 
 fn main() {
     // Game Config
+    let start_time = Instant::now();
+
     let window_width = 800;
     let window_height = 600;
 
@@ -63,13 +66,8 @@ fn main() {
         3.5
     );
 
-    let mut enemies: Vec<Entity> = vec![
-        Entity::new(
-            Position { x: 364.0, y: 0.0 },
-            Size { width: 64, height: 64 },
-            2.3
-        )
-    ];
+    let mut enemies: Vec<Entity> = Vec::new();
+    let mut last_enemy_spawn: f32 = 0.0;
 
     let mut score: u32 = 0;
     let mut score_rect = Rect::new(15, 15, 0, 0);
@@ -97,6 +95,8 @@ fn main() {
     // Game Loop
     let mut event_pump = sdl_context.event_pump().unwrap();
     'running: loop {
+        let runtime: f32 = (Instant::now() - start_time).as_secs_f32();
+    
         // Clear Canvas
         canvas.set_draw_color(Color::RGB(0, 0, 0));
         canvas.clear();
@@ -134,12 +134,31 @@ fn main() {
         canvas.copy(&player_texture, None, Some(player.rect)).unwrap();
 
         // Enemies
+        if enemies.len() < 7 && runtime > last_enemy_spawn + 1.0 {
+            let random_enemy_size: u32 = rand::thread_rng().gen_range(64..=96);
+
+            enemies.push(
+                Entity::new(
+                    Position {
+                        x: rand::random::<f32>() * ((window_width - random_enemy_size) as f32),
+                        y: -(random_enemy_size as f32)
+                    },
+                    Size {
+                        width: random_enemy_size,
+                        height: random_enemy_size
+                    },
+                    2.4 + (rand::random::<f32>() * 1.2)
+                )
+            );
+
+            last_enemy_spawn = runtime;
+        }
+
         for enemy in &mut enemies {
             enemy.position.y = enemy.position.y + enemy.speed;
             enemy.update_rect();
 
             if rects_collide(&enemy.rect, &player.rect) {
-                println!("Game over.");
                 break 'running;
             }
 
@@ -168,5 +187,5 @@ fn main() {
         ::std::thread::sleep(Duration::new(0, 1_000_000_000u32 / 60));
     }
 
-    println!("Exiting game..");
+    println!("Game Over\nScore: {}", score);
 }
