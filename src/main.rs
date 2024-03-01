@@ -29,9 +29,9 @@ impl Entity {
     fn new(position: Position, size: Size, speed: f32) -> Entity {
         Entity {
             rect: Rect::new(position.x.round() as i32, position.y.round() as i32, size.width, size.height),
-            position: position,
-            size: size,
-            speed: speed
+            position,
+            size,
+            speed
         }
     }
 
@@ -99,7 +99,7 @@ fn main() {
                 Event::KeyDown { keycode, .. } => {
                     if let Some(pressed_key) = keycode {
                         match pressed_key {
-                            Keycode::Escape => break 'running,
+                            Keycode::Escape | Keycode::Q => break 'running,
                             _ => {}
                         }
                     }
@@ -129,7 +129,7 @@ fn main() {
             enemy.position.y = enemy.position.y + enemy.speed;
 
             if rects_collide(&enemy.get_rect(), &player.get_rect()) {
-                println!("Game Over!");
+                println!("Game over.");
                 break 'running;
             }
 
