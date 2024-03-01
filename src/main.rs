@@ -2,7 +2,7 @@
 use sdl2::image::LoadTexture;
 use sdl2::pixels::Color;
 use sdl2::event::Event;
-use sdl2::keyboard::{Keycode, Scancode};
+use sdl2::keyboard::Scancode;
 use sdl2::rect::Rect;
 use std::time::Duration;
 
@@ -85,8 +85,8 @@ fn main() {
     let mut canvas = window.into_canvas().build().unwrap();
     
     let texture_creator = canvas.texture_creator();
-    let enemy_texture = texture_creator.load_texture("assets/baddie.png").unwrap();
     let player_texture = texture_creator.load_texture("assets/player.png").unwrap();
+    let enemy_texture = texture_creator.load_texture("assets/baddie.png").unwrap();
 
     let mut event_pump = sdl_context.event_pump().unwrap();
     'running: loop {
@@ -107,10 +107,10 @@ fn main() {
 
         for scancode in event_pump.keyboard_state().pressed_scancodes().into_iter() {
             match scancode {
-                Scancode::Escape | Scancode::Q => break 'running,
+                Scancode::Q | Scancode::Escape => break 'running,
                 Scancode::A | Scancode::Left => move_dir = -player.speed,
                 Scancode::D | Scancode::Right => move_dir = player.speed,
-                _ => {}
+                _ => ()
             }
         }
 
