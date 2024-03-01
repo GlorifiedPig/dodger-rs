@@ -25,20 +25,15 @@ struct Entity {
 
 impl Entity {
     fn new(position: Position, size: Size, speed: f32) -> Entity {
-        Entity {
-            rect: Rect::new(position.x.round() as i32, position.y.round() as i32, size.width, size.height),
-            position,
-            size,
-            speed
-        }
+        let rect = Rect::new(position.x.round() as i32, position.y.round() as i32, size.width, size.height);
+        Entity { rect, position, size, speed }
     }
 
-    fn get_rect(&mut self) -> Rect {
+    fn update_rect(&mut self) {
         self.rect.x = self.position.x.round() as i32;
         self.rect.y = self.position.y.round() as i32;
         self.rect.w = self.size.width as i32;
         self.rect.h = self.size.height as i32;
-        self.rect
     }
 }
 
@@ -122,13 +117,16 @@ fn main() {
             player.position.x = (window_width - player.size.width) as f32;
         }
 
-        canvas.copy(&player_texture, None, Some(player.get_rect())).unwrap();
+        player.update_rect();
+
+        canvas.copy(&player_texture, None, Some(player.rect)).unwrap();
 
         // Enemies
         for enemy in &mut enemies {
             enemy.position.y = enemy.position.y + enemy.speed;
+            enemy.update_rect();
 
-            if rects_collide(&enemy.get_rect(), &player.get_rect()) {
+            if rects_collide(&enemy.rect, &player.rect) {
                 println!("Game over.");
                 break 'running;
             }
@@ -138,7 +136,7 @@ fn main() {
                 enemy.position.y = -(enemy.size.width as f32);
             }
 
-            canvas.copy(&enemy_texture, None, Some(enemy.get_rect())).unwrap();
+            canvas.copy(&enemy_texture, None, Some(enemy.rect)).unwrap();
         }
 
         // Present the canvas & sleep
