@@ -71,8 +71,11 @@ fn main() {
 
     let mut event_pump = sdl_context.event_pump().unwrap();
     'running: loop {
+        // Clear Canvas
         canvas.set_draw_color(Color::RGB(0, 0, 0));
         canvas.clear();
+
+        // Event Loop
         for event in event_pump.poll_iter() {
             match event {
                 Event::KeyDown { keycode, .. } => {
@@ -88,29 +91,28 @@ fn main() {
             }
         }
 
-        let mut moving_left = false;
-        let mut moving_right = false;
+        // Player
+        let mut move_dir = 0.0;
 
         for scancode in event_pump.keyboard_state().pressed_scancodes().into_iter() {
             match scancode {
-                Scancode::A => moving_left = true,
-                Scancode::Left => moving_left = true,
-                Scancode::D => moving_right = true,
-                Scancode::Right => moving_right = true,
+                Scancode::A | Scancode::Left => move_dir = -3.0,
+                Scancode::D | Scancode::Right => move_dir = 3.0,
                 _ => {}
             }
         }
 
-        if moving_left { player.position.x = player.position.x - 3.0 }
-        if moving_right { player.position.x = player.position.x + 3.0 }
+        player.position.x = player.position.x + move_dir;
 
+        canvas.copy(&player_texture, None, Some(player.get_rect())).unwrap();
+
+        // Enemies
         for enemy in &mut enemies {
             enemy.position.y = enemy.position.y + 1.0;
             canvas.copy(&enemy_texture, None, Some(enemy.get_rect())).unwrap();
         }
 
-        canvas.copy(&player_texture, None, Some(player.get_rect())).unwrap();
-
+        // Present the canvas & sleep
         canvas.present();
         ::std::thread::sleep(Duration::new(0, 1_000_000_000u32 / 60));
     }
