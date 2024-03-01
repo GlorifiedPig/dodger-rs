@@ -30,10 +30,10 @@ impl Entity {
     }
 
     fn update_rect(&mut self) {
-        self.rect.x = self.position.x.round() as i32;
-        self.rect.y = self.position.y.round() as i32;
-        self.rect.w = self.size.width as i32;
-        self.rect.h = self.size.height as i32;
+        self.rect.set_x(self.position.x.round() as i32);
+        self.rect.set_y(self.position.y.round() as i32);
+        self.rect.set_width(self.size.width);
+        self.rect.set_height(self.size.height);
     }
 }
 
