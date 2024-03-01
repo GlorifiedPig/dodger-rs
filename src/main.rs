@@ -72,6 +72,8 @@ fn main() {
     let mut score: u32 = 0;
     let mut score_rect = Rect::new(15, 15, 0, 0);
 
+    let starting_enemies: u32 = 6;
+
     // SDL2
     let sdl_context = sdl2::init().unwrap();
     let video_subsystem = sdl_context.video().unwrap();
@@ -134,8 +136,10 @@ fn main() {
         canvas.copy(&player_texture, None, Some(player.rect)).unwrap();
 
         // Enemies
-        if enemies.len() < 7 && runtime > last_enemy_spawn + 1.0 {
-            let random_enemy_size: u32 = rand::thread_rng().gen_range(64..=96);
+        let difficulty = (runtime / 5.0).floor().max(20.0) as u32; // difficulty increases every 5 seconds with a maximum of 20.
+
+        if enemies.len() < (starting_enemies + difficulty) as usize && runtime > last_enemy_spawn + 0.65 {
+            let random_enemy_size: u32 = rand::thread_rng().gen_range(64 + difficulty..=96 + difficulty * 2);
 
             enemies.push(
                 Entity::new(
@@ -147,7 +151,7 @@ fn main() {
                         width: random_enemy_size,
                         height: random_enemy_size
                     },
-                    2.4 + (rand::random::<f32>() * 1.2)
+                    (2.4 + difficulty as f32 / 10.0) + (rand::random::<f32>() * (1.2 + difficulty as f32 / 10.0))
                 )
             );
 
@@ -163,13 +167,13 @@ fn main() {
             }
 
             if enemy.position.y > window_height as f32 {
-                enemy.position.x = rand::random::<f32>() * ((window_width - enemy.size.width) as f32);
-                enemy.position.y = -(enemy.size.width as f32);
                 score = score + 1;
             }
 
             canvas.copy(&enemy_texture, None, Some(enemy.rect)).unwrap();
         }
+
+        enemies.retain(|enemy| enemy.position.y <= window_height as f32);
 
         // Draw Score
         let score_surface = font.render(format!("Score: {}", score).as_str()).blended(Color::WHITE).unwrap();
